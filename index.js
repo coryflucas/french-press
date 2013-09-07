@@ -11,7 +11,6 @@ var listTemplate;
 var repo;
 
 var url = require('url');
-var xml = require('easyxml');
 var postRepo = require('./lib/post-repo');
 
 exports.blog = function (options) {
@@ -29,10 +28,10 @@ exports.blog = function (options) {
         });
         switch (urlParts.length) {
             case 0:
-                list(req, res);
+                list(req, res, next);
                 return;
             case 1:
-                view(req, res, urlParts[0])
+                view(req, res, next, urlParts[0])
                 return;
         }
 
@@ -40,7 +39,7 @@ exports.blog = function (options) {
     }
 }
 
-list = function (req, res) {
+list = function (req, res, next) {
 
     var reqUrl = url.parse(req.url, true);
     var count = reqUrl.query.count || 10;
@@ -48,8 +47,7 @@ list = function (req, res) {
 
     repo.findPosts(count, offset, function (err, posts) {
         if (err) {
-            console.log(err);
-            res.send(500);
+            next(err);
         } else {
             var postAttribs = posts.map(function (p) {
                 return p.attributes;
@@ -63,10 +61,9 @@ list = function (req, res) {
 view = function (req, res, permLink) {
     repo.getPost(permLink, function (err, post) {
         if (err) {
-            console.log(err);
-            res.send(500);
+            next(err);
         } else if (!post) {
-            res.send(404);
+            next();
         } else {
             format(res, post, postTemplate);
         }
@@ -81,9 +78,9 @@ format = function (res, result, template) {
         json: function () {
             res.json(result);
         },
-        xml: function () {
+        /*xml: function () {
             res.send(xml.render(result));
-        },
+        },*/
         default: function () {
             res.send(406, 'invalid format requested');
         }
