@@ -1,4 +1,4 @@
-Frech Press
+French Press
 ===========
 
 ## What Is It?
