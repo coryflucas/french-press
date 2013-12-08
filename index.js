@@ -31,15 +31,15 @@ exports.blog = function (options) {
                 list(req, res, next);
                 return;
             case 1:
-                view(req, res, next, urlParts[0])
+                view(req, res, next, urlParts[0]);
                 return;
         }
 
         next();
     }
-}
+};
 
-list = function (req, res, next) {
+var list = function (req, res, next) {
 
     var reqUrl = url.parse(req.url, true);
     var count = reqUrl.query.count || 10;
@@ -56,9 +56,9 @@ list = function (req, res, next) {
             format(res, {posts: postAttribs}, listTemplate);
         }
     });
-}
+};
 
-view = function (req, res, permLink) {
+var view = function (req, res, next, permLink) {
     repo.getPost(permLink, function (err, post) {
         if (err) {
             next(err);
@@ -68,9 +68,9 @@ view = function (req, res, permLink) {
             format(res, post, postTemplate);
         }
     });
-}
+};
 
-format = function (res, result, template) {
+var format = function (res, result, template) {
     res.format({
         html: function () {
             res.render(template, result);
@@ -85,4 +85,4 @@ format = function (res, result, template) {
             res.send(406, 'invalid format requested');
         }
     });
-}
+};
